@@ -50,7 +50,7 @@ def devide(img):
     img3 = img[int(m / 2):, :int(n / 2)]
     img4 = img[int(m / 2):, int(n / 2):]
 
-    # 直方图均衡化
+    # 对分块后的直方图均衡化
     # 方法一
     # ret1 = cv2.equalizeHist(img1)
     # ret2 = cv2.equalizeHist(img2)
@@ -69,6 +69,7 @@ def devide(img):
     level1_img[:math.ceil(m / 2), math.ceil(n / 2):] = ret2
     level1_img[math.ceil(m / 2):, :math.ceil(n / 2)] = ret3
     level1_img[math.ceil(m / 2):, math.ceil(n / 2):] = ret4
+
     return level1_img
 
 
@@ -129,15 +130,24 @@ def custom_threshold(image):
     mean = m.sum()/(w*h)
     # print("mean:",mean)
     ret, binary =  cv2.threshold(image, mean, 255, cv2.THRESH_BINARY)
+
     return binary
 
 
 # 轮廓拟合
 def contours_demo(image):
+    # 原始二值化得到的图像是float类型，进行类型转换
     image=np.array(image,dtype='uint8')
-    # cloneimage 显示图像，查找轮廓
+    """
+        cloneimage 显示图像，查找轮廓
+        需要注意的是此处是cv2版本
+        cv在2和4版本里面cv2.findContours需要的是两个参数
+        在3版本里面只需要两个参数改成
+        contours, heriachy = cv2.findContours(image, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+        即可
+    """
     cloneimage,contours, heriachy = cv2.findContours(image, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
-
+    # 绘制图像
     for i, contour in enumerate(contours):
         # 函数cv2.drawContours()被用来绘制轮廓。
         # 第一个参数是一张图片，可以是原图或者其他。

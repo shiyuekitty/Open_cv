@@ -26,11 +26,9 @@ if __name__ == '__main__':
     binaryzation_2 = function.custom_threshold(img_prewitt_2)
 
     # 轮廓拟合
-    Image_1= function.contours_demo(binaryzation_1)
-    Image_2= function.contours_demo(binaryzation_2)
+    Image_1 = function.contours_demo(binaryzation_1)
+    Image_2 = function.contours_demo(binaryzation_2)
 
-
-    # 结果显示
     # 原图
     plt.subplot(241), plt.imshow(img, cmap='gray')
     plt.title('primary'), plt.xticks([]), plt.yticks([])
@@ -52,4 +50,5 @@ if __name__ == '__main__':
     plt.title('Image_1'), plt.xticks([]), plt.yticks([])
     plt.subplot(248), plt.imshow(Image_2, cmap='gray')
     plt.title('Image_2'), plt.xticks([]), plt.yticks([])
+    # 结果显示
     plt.show()
