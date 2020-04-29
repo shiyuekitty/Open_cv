@@ -1,6 +1,8 @@
 import numpy as np
 import cv2
 import math
+from matplotlib import pyplot as plt
+
 
 # 绘制直方图
 def histogram(img):
@@ -16,6 +18,7 @@ def histogram(img):
         for j in range(img.shape[1]):
             hist[img[i][j]] += 1
     return l, hist
+
 
 # 直方图均衡化
 def level(img):
@@ -41,6 +44,7 @@ def level(img):
     l, new_hist = histogram(new_img)
     return new_img
 
+
 # 分块直方图均衡化，获取局部增强结果
 def devide(img):
     # 图像分块
@@ -56,7 +60,7 @@ def devide(img):
     # ret2 = cv2.equalizeHist(img2)
     # ret3 = cv2.equalizeHist(img3)
     # ret4 = cv2.equalizeHist(img4)
-    
+
     # 方法二
     ret1 = level(img1)
     ret2 = level(img2)
@@ -80,10 +84,9 @@ def imgConvolve(image, kernel):
     :param kernel: 滤波窗口
     :return:卷积后的矩阵
     '''
-    img_h = int(image.shape[0])
-    img_w = int(image.shape[1])
-    kernel_h = int(kernel.shape[0])
-    kernel_w = int(kernel.shape[1])
+
+    img_h, img_w = image.shape
+    kernel_h, kernel_w = kernel.shape
     # padding
     padding_h = int((kernel_h - 1) / 2)
     padding_w = int((kernel_w - 1) / 2)
@@ -105,6 +108,7 @@ def imgConvolve(image, kernel):
 
     return image_convolve
 
+
 # Prewitt算子边缘锐化
 def prewittEdge(image, prewitt_x, prewitt_y):
     '''
@@ -122,14 +126,15 @@ def prewittEdge(image, prewitt_x, prewitt_y):
             img_prediction[i][j] = max(img_X[i][j], img_Y[i][j])
     return img_prediction
 
+
 # 图像二值化
 def custom_threshold(image):
     # 计算图像均值
-    h, w =image.shape[:2]
-    m = np.reshape(image, [1,w*h])
-    mean = m.sum()/(w*h)
+    h, w = image.shape[:2]
+    m = np.reshape(image, [1, w * h])
+    mean = m.sum() / (w * h)
     # print("mean:",mean)
-    ret, binary =  cv2.threshold(image, mean, 255, cv2.THRESH_BINARY)
+    ret, binary = cv2.threshold(image, mean, 255, cv2.THRESH_BINARY)
 
     return binary
 
@@ -137,7 +142,7 @@ def custom_threshold(image):
 # 轮廓拟合
 def contours_demo(image):
     # 原始二值化得到的图像是float类型，进行类型转换
-    image=np.array(image,dtype='uint8')
+    image = np.array(image, dtype='uint8')
     """
         cloneimage 显示图像，查找轮廓
         需要注意的是此处是cv2版本
@@ -146,7 +151,7 @@ def contours_demo(image):
         contours, heriachy = cv2.findContours(image, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
         即可
     """
-    cloneimage,contours, heriachy = cv2.findContours(image, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+    cloneimage, contours, heriachy = cv2.findContours(image, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
     # 绘制图像
     for i, contour in enumerate(contours):
         # 函数cv2.drawContours()被用来绘制轮廓。
@@ -159,3 +164,29 @@ def contours_demo(image):
 
     return image
 
+
+# 展示
+def show(img, img1, img2, img3, img4, img5, img6, img7):
+    # 原图
+    plt.subplot(241), plt.imshow(img, cmap='gray')
+    plt.title('primary'), plt.xticks([]), plt.yticks([])
+    # 局部增强
+    plt.subplot(242), plt.imshow(img1, cmap='gray')
+    plt.title('level_img'), plt.xticks([]), plt.yticks([])
+    # 边缘锐化
+    plt.subplot(243), plt.imshow(img2, cmap='gray')
+    plt.title('prewitt_1'), plt.xticks([]), plt.yticks([])
+    plt.subplot(244), plt.imshow(img3, cmap='gray')
+    plt.title('prewitt_2'), plt.xticks([]), plt.yticks([])
+    # 二值化
+    plt.subplot(245), plt.imshow(img4, cmap='gray')
+    plt.title('binaryzation_1'), plt.xticks([]), plt.yticks([])
+    plt.subplot(246), plt.imshow(img5, cmap='gray')
+    plt.title('binaryzation_2'), plt.xticks([]), plt.yticks([])
+    # 提取边缘轮廓
+    plt.subplot(247), plt.imshow(img6, cmap='gray')
+    plt.title('Image_1'), plt.xticks([]), plt.yticks([])
+    plt.subplot(248), plt.imshow(img7, cmap='gray')
+    plt.title('Image_2'), plt.xticks([]), plt.yticks([])
+    # 结果显示
+    plt.show()
