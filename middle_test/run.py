@@ -1,11 +1,8 @@
-import cv2
 import numpy as np
-from matplotlib import pyplot as plt
 import function
 
 
 def run(img):
-
     # 分块均衡化直方图
     level_img = function.devide(img)
 
