@@ -6,6 +6,7 @@ from matplotlib import pyplot as plt
 
 # 绘制直方图
 def histogram(img):
+    # 判断数据类型
     if img.dtype == 'uint8':
         hist = np.zeros(256)
         l = 256
@@ -41,7 +42,7 @@ def level(img):
         for j in range(img.shape[1]):
             if img[i][j] in Cumulative_histogram.keys():
                 new_img[i][j] = Cumulative_histogram[img[i][j]]
-    l, new_hist = histogram(new_img)
+
     return new_img
 
 
@@ -114,7 +115,7 @@ def prewittEdge(image, prewitt_x, prewitt_y):
     '''
     :param image: 图片矩阵
     :param prewitt_x: 竖直方向
-    :param prewitt_y:  水平方向
+    :param prewitt_y: 水平方向
     :return:处理后的矩阵
     '''
     img_X = imgConvolve(image, prewitt_x)
@@ -133,9 +134,7 @@ def custom_threshold(image):
     h, w = image.shape[:2]
     m = np.reshape(image, [1, w * h])
     mean = m.sum() / (w * h)
-    # print("mean:",mean)
     ret, binary = cv2.threshold(image, mean, 255, cv2.THRESH_BINARY)
-
     return binary
 
 
@@ -154,14 +153,14 @@ def contours_demo(image):
     cloneimage, contours, heriachy = cv2.findContours(image, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
     # 绘制图像
     for i, contour in enumerate(contours):
-        # 函数cv2.drawContours()被用来绘制轮廓。
-        # 第一个参数是一张图片，可以是原图或者其他。
-        # 第二个参数是轮廓，也可以说是cv2.findContours()找出来的点集，一个列表。
-        # 第三个参数是对轮廓（第二个参数）的索引，当需要绘制独立轮廓时很有用，若要全部绘制可设为-1。
-        # 接下来的参数是轮廓的颜色和厚度。
-        # print(i)
+        """
+            函数cv2.drawContours()被用来绘制轮廓。
+            第一个参数是一张图片，可以是原图或者其他。
+            第二个参数是轮廓，也可以说是cv2.findContours()找出来的点集，一个列表。
+            第三个参数是对轮廓（第二个参数）的索引，当需要绘制独立轮廓时很有用，若要全部绘制可设为-1。
+            接下来的参数是轮廓的颜色和厚度。
+        """
         cv2.drawContours(image, contours, i, (0, 0, 255), 2)
-
     return image
 
 

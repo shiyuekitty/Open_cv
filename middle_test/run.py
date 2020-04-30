@@ -12,9 +12,15 @@ def run(img):
     t_prewitt_3 = np.array([[0, 1, 1], [-1, 0, 1], [-1, -1, 0]])
     t_prewitt_4 = np.array([[-1, -1, 0], [-1, 0, 1], [0, 1, 1]])
 
-    # 原始图prewitt算子进行边缘锐化
+    '''
+        纵横方向
+        原始图prewitt算子进行边缘锐化
+    '''
     img_prewitt_1 = function.prewittEdge(img, t_prewitt_1, t_prewitt_2)
-    # 直方图均衡化+prewitt算子进行边缘锐化
+    '''
+        对角线方向
+        直方图均衡化后的prewitt算子进行边缘锐化 
+    '''
     img_prewitt_2 = function.prewittEdge(level_img, t_prewitt_3, t_prewitt_4)
 
     # 图像二值化
