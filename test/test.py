@@ -1,61 +1,98 @@
-import cv2
-import numpy as np
-from matplotlib import pyplot as plt
-import math
+import requests
+import re
+import os
+import random
+import time
+from fake_useragent import UserAgent
+
+import winreg
+def get_desktop():
+    key = winreg.OpenKey(winreg.HKEY_CURRENT_USER,
+                          r'Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders',)
+    return winreg.QueryValueEx(key, "Desktop")[0]
 
 
-#########################  template process  ########################
+# 存储得位置，桌面上创建一个下载文件
+saveImagPath = get_desktop() +"\\" + "下载文件"
+os.path.exists(saveImagPath)
+if not os.path.exists(saveImagPath):
+    os.mkdir(saveImagPath)
 
-##   average-neighborhood
-##   template convolution
-def template_convolution(img,temp):
-    r,c = img.shape
-    h1,v1 = temp.shape
-    h = math.floor(h1 / 2)  ## threshold of row
-    v = math.floor(v1 / 2)  ## threshold ofColumn
-    N = sum(sum(temp))
-    new_img = np.zeros((r,c))
-    for i in range(h,r-h):
-        for j in range(v,c-v):
-            if N !=0:
-                new_img[i][j] = abs(np.sum(img[i-h:i+h+1,j-v:j+v+1] * temp))/N
+saveImagFile = saveImagPath
+
+ua=UserAgent()
+
+
+for j in range(1,237):
+    t = 'http://www.mangareader.net/doraemon'+ '/'+ str(j)
+    headers = {'User-Agent': ua.random}
+    headers.update({'Cookie': '__cfduid=dffbec8ee6e5ebd0d1d60a22bbc10c7d01587445599; BB_plg=pm; _ga=GA1.2.2106140754.1587445603; _gid=GA1.2.456110379.1587445603; bbl=5; fjulakwal=1'})
+    headers.update({'Host': 'www.mangareader.net'})
+    headers.update({'Connection': 'keep-alive'})
+    headers.update({'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9'})
+    headers.update({'Accept-Encoding': 'gzip, deflate'})
+    headers.update({'Accept-Language': 'zh-CN,zh;q=0.9'})
+    headers.update({'Upgrade-Insecure-Requests': '1'})
+    response = requests.get(t, headers=headers)
+    saveimagLog = get_desktop() + "\\" + "下载文件" + "\\Log{}.txt".format(j)
+    folog = open(saveimagLog, "w")
+    if response.status_code ==200:
+        html = response.text
+        pag = re.findall('</select> of (.*?)</div>', html)
+        a = int(pag[0])
+        log = ('第{}章节有{}个图片\r'.format(j,a))
+        print(log)
+        folog.write(log)
+
+        for i in range(1, int(pag[0])+1):
+
+            time.sleep(4)
+            # 获得每一页的地址
+            I = t + '/' + str(i)
+
+            response = requests.get(I, headers=headers)
+            if response.status_code == 200:
+                html = response.text
+
+                # 获取每个图片的地址
+                urls = re.findall('<img id=".*?" width=".*?" height=".*?" src="(.*?)" alt=".*?" />', html)
+                # 获取图片和名称
+                for url in urls:
+                    print(url)
+
+                    name = url.split('-')[-1]
+
+                    headImagUrl = {}
+                    headImagUrl.update({'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9'})
+                    headImagUrl.update({'Host': 'i5.imggur.net'})
+                    headImagUrl.update({'If-Modified-Since': 'Sat, 30 Oct 2010 22:44:22 GMT'})
+                    headImagUrl.update({'If-None-Match': "4ccc9fc6-1b01c"})
+                    headImagUrl.update({'Upgrade-Insecure-Requests': '1'})
+                    headImagUrl.update({'User-Agent':ua.random})
+
+
+
+                    response = requests.get(url, headers=headImagUrl)
+                # 将图片写入文件夹
+                    if response.status_code == 200:
+                        information = '第 {} 章节中第 {} 个图片得地址是 {} ,文件写入成功'.format(j, i, url)
+                        print(information)
+                        folog.write(information + "\r")
+
+                        saveImagFile = saveImagPath +"\\" + str(j) +"_" + name
+                        with open(saveImagFile, 'wb') as f:
+                            f.write(response.content)
+                    else:
+                        information = '第{}章节中第{}个图片没有读到，错误信息{},文件写入失败，请手动下载,图片地址是{}'.format(j, i, response.status_code, url)
+                        print(information)
+                        folog.write(information + "\r")
             else:
-                new_img[i][j] = abs(np.sum(img[i-h:i+h+1,j-v:j+v+1] * temp))
-    return new_img
+                information = '第{}章节中第{}个图片没有读到，错误信息{},文件写入失败，请手动下载'.format(j, i, response.status_code)
+                print(information)
+                folog.write(information + "\r")
 
-if __name__ == '__main__':
-    img = cv2.imread('../image/lena-gray.png', -1)
-    ##   define the template
-    t_3 = np.ones((3,3))
-    t_11 = np.ones((11,11))
-    t_Gaussian = np.array([[1,4,7,4,1],[4,16,26,16,4],[7,26,41,26,7],[4,16,26,16,4],[1,4,5,4,1]])
-    t_Lap = np.array([[-1,-1,-1],[-1,8,-1],[-1,-1,-1]])
-    # new_img3 = template_convolution(img,t_3)
-    # new_img11 = template_convolution(img,t_11)
-    new_imgG = template_convolution(img,t_Gaussian)
-    new_imgL = template_convolution(img,t_Lap)
-    plt.subplot(231),plt.imshow(img,cmap = 'gray')
-    plt.title('Input Image'), plt.xticks([]), plt.yticks([])
-    plt.subplot(234),plt.imshow(new_imgG,cmap = 'gray')
-    plt.title('Gaussian Average'), plt.xticks([]), plt.yticks([])
-    plt.subplot(235),plt.imshow(new_imgL,cmap = 'gray')
-    plt.title('Laplace sharp'), plt.xticks([]), plt.yticks([])
-    plt.show()
-##   template_sort for max\min\median\mean
-##   flag = None is mean, =1 is max, =-1 is min =0 is median
-##   temp is the size of the template(row and column are euqal)
-# def template_sort(img,temp,flag=None):
-#     r,c = img.shape
-#     h = math.floor(temp/2)  ## threshold of row and column
-#     new_img = np.zeros((r,c))
-#     for i in range(h,r-h):
-#         for j in range(h,c-h):
-#             if flag == None:
-#                 new_img[i][j] = np.mean(img[i-h:i+h+1,j-h:j+h+1])
-#             elif flag == 1:
-#                 new_img[i][j] = np.max(img[i-h:i+h+1,j-h:j+h+1])
-#             elif flag == -1:
-#                 new_img[i][j] = np.min(img[i-h:i+h+1,j-h:j+h+1])
-#             elif flag == 0:
-#                 new_img[i][j] = np.median(img[i-h:i+h+1,j-h:j+h+1])
-#     return new_img
+    else:
+        log ='第{}章访问出错，请自己手动访问，或者重新执行程序'.format(j)
+        folog.write(log)
+
+    folog.close()

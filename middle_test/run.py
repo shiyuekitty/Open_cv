@@ -4,9 +4,7 @@ from matplotlib import pyplot as plt
 import function
 
 
-def run():
-    # 读入图片
-    img = cv2.imread('../image/lena-gray.png', -1)
+def run(img):
 
     # 分块均衡化直方图
     level_img = function.devide(img)
