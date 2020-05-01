@@ -56,11 +56,13 @@ def devide(img):
     img4 = img[int(m / 2):, int(n / 2):]
 
     # 对分块后的直方图均衡化
-    # 方法一
-    # ret1 = cv2.equalizeHist(img1)
-    # ret2 = cv2.equalizeHist(img2)
-    # ret3 = cv2.equalizeHist(img3)
-    # ret4 = cv2.equalizeHist(img4)
+    '''
+    方法一
+    ret1 = cv2.equalizeHist(img1)
+    ret2 = cv2.equalizeHist(img2)
+    ret3 = cv2.equalizeHist(img3)
+    ret4 = cv2.equalizeHist(img4)
+    '''
 
     # 方法二
     ret1 = level(img1)
@@ -74,7 +76,6 @@ def devide(img):
     level1_img[:math.ceil(m / 2), math.ceil(n / 2):] = ret2
     level1_img[math.ceil(m / 2):, :math.ceil(n / 2)] = ret3
     level1_img[math.ceil(m / 2):, math.ceil(n / 2):] = ret4
-
     return level1_img
 
 
@@ -134,6 +135,7 @@ def custom_threshold(image):
     h, w = image.shape[:2]
     m = np.reshape(image, [1, w * h])
     mean = m.sum() / (w * h)
+    # 给定参数二值化
     ret, binary = cv2.threshold(image, mean, 255, cv2.THRESH_BINARY)
     return binary
 
@@ -166,26 +168,31 @@ def contours_demo(image):
 
 # 展示
 def show(img, img1, img2, img3, img4, img5, img6, img7):
-    # 原图
+    '''
+    :param img: 原图
+    :param img1: 局部增强
+    :param img2: 边缘锐化
+    :param img3: 边缘锐化
+    :param img4: 二值化
+    :param img5: 二值化
+    :param img6: 提取边缘轮廓
+    :param img7: 提取边缘轮廓
+    :return: 结果显示
+    '''
     plt.subplot(241), plt.imshow(img, cmap='gray')
     plt.title('primary'), plt.xticks([]), plt.yticks([])
-    # 局部增强
     plt.subplot(242), plt.imshow(img1, cmap='gray')
     plt.title('level_img'), plt.xticks([]), plt.yticks([])
-    # 边缘锐化
     plt.subplot(243), plt.imshow(img2, cmap='gray')
     plt.title('prewitt_1'), plt.xticks([]), plt.yticks([])
     plt.subplot(244), plt.imshow(img3, cmap='gray')
     plt.title('prewitt_2'), plt.xticks([]), plt.yticks([])
-    # 二值化
     plt.subplot(245), plt.imshow(img4, cmap='gray')
     plt.title('binaryzation_1'), plt.xticks([]), plt.yticks([])
     plt.subplot(246), plt.imshow(img5, cmap='gray')
     plt.title('binaryzation_2'), plt.xticks([]), plt.yticks([])
-    # 提取边缘轮廓
     plt.subplot(247), plt.imshow(img6, cmap='gray')
     plt.title('Image_1'), plt.xticks([]), plt.yticks([])
     plt.subplot(248), plt.imshow(img7, cmap='gray')
     plt.title('Image_2'), plt.xticks([]), plt.yticks([])
-    # 结果显示
     plt.show()
