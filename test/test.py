@@ -47,8 +47,8 @@ for j in range(1,237):
         for i in range(1, int(pag[0])+1):
 
             time.sleep(4)
-            # 获得每一页的地址
             I = t + '/' + str(i)
+            # 获得每一页的地址
 
             response = requests.get(I, headers=headers)
             if response.status_code == 200:
