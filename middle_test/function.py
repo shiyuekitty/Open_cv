@@ -162,9 +162,8 @@ def contours_demo(image):
             第三个参数是对轮廓（第二个参数）的索引，当需要绘制独立轮廓时很有用，若要全部绘制可设为-1。
             接下来的参数是轮廓的颜色和厚度。
         """
-        cv2.drawContours(image, contours, i, (0, 0, 255), 2)
+        cv2.drawContours(image, contours, i, (0, 0, 255), 0)
     return image
-
 
 # 展示
 def show(img, img1, img2, img3, img4, img5, img6, img7):
